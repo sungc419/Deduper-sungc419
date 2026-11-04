@@ -1,27 +1,37 @@
-Goal: Identify and remove PCR duplicates from a SAM file of uniquely mapped reads by writing a python script to read a sorted sam file of uniquely mapped reads and remove all PCR duplicates, retaining only a single copy of each read and outputting a sam file.
+## Goal:
+Develop a memory-efficient Python script to identify and remove PCR duplicates from a sorted SAM file of uniquely mapped reads, retaining only one copy of each read without loading the entire file into memory.
 
-Define the problem: PCR duplicates are identical sequencing reads that arise during PCR amplification. They should be removed because they could cause a bias in sequencing depth and affect analyses that rely on the sequencing counts. The goal of this project is to identify and remove PCR duplicates from a SAM file of uniquely mapped reads.
+```
+Input: sorted SAM file 
+Output: deduplicated SAM file
+```
+
+## Define the problem:
+PCR duplicates are identical sequencing reads produced during PCR amplification. Their presence can inflate estimates of sequencing depth and introduce bias into downstream analyses that rely on read counts. Removing these duplicates helps ensure that sequencing data more accurately reflect the underlying biological sample.
 
 PCR duplicates will have the same:
-- chromosome 
-- left-most mapping position and 5' position (to account for soft clipping)
-- strand
-- UMI
+- chromosome (RNAME or column 3)
+- UMI (end of QNAME or column 1)
+- 5' position, calculate with:
+    1) 1 base left-most mapping position (POS or column 4)
+    2) strand (+/-): either 5'->3' or 3'-> 5' (FLAG or column 2)
+    3) CIGAR string (column 6) 
+        1) either M, S, D, I, N, X (column 6)
+        2) 
 
+## Pseudocode:
 ```
 #!/usr/bin/env python
 
 import argparse
-import gzip
 
 set up argparse including input sam file, output sam file, umi file
 
-initialize list to hold UMIs
+initialize set to hold UMIs
 open and read file:
     loop through each line in file
-            strip newline characters and split by tab
-                if line not in list:
-                    add to list
+            strip newline characters 
+                    add to set
 
 open input file to read, open outputfile to write:
     loop through each line in file
@@ -37,27 +47,35 @@ open input file to read, open outputfile to write:
                 continue
             else:
                 write out to file
+            add counter for UMI
 
+print out to file:
+    # reads kept, # dupes, and # bad UMIs
 
+```
+
+Functions:
 ```
 get_pos(position, cigar, strand):
 split cigar string into each section 
 for each tuple:
-    if tuple is 'S':
-        set that as soft clipped
+    if strand is forward:
+        position - S (left)
+    if strand if reverse:
+        position + N + D + M + S (right)
 return position 
 
+
 get_umi(column 1):
-'''Function to create list of UMIs'''
+'''Function to create set of UMIs'''
 return last element after splitting by ':'
 
-check_strand(column 2):
-if flag & 16 == 16, return neg, else return pos
 
-is_duplicate:
-'''Function to check if a record is a PCR duplicate'''
-Check flag for reverse or not
-return true if true, false if false
-```
+check_strand(column 2):
+if flag & 16 == 16, 
+return neg, else return pos
+
+
+
 
 

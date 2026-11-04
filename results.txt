@@ -1,0 +1,3 @@
+The number of reads kept is 13719048.
+The number of duplicates is 4467362.
+The number of unmatched UMIs is 0.
