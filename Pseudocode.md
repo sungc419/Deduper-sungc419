@@ -15,9 +15,7 @@ PCR duplicates will have the same:
 - 5' position, calculate with:
     1) 1 base left-most mapping position (POS or column 4)
     2) strand (+/-): either 5'->3' or 3'-> 5' (FLAG or column 2)
-    3) CIGAR string (column 6) 
-        1) either M, S, D, I, N, X (column 6)
-        2) 
+    3) CIGAR string (column 6) - either M, S, D, I, N, X 
 
 ## Pseudocode:
 ```
